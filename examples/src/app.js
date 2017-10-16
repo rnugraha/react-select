@@ -17,9 +17,23 @@ import Virtualized from './components/Virtualized';
 import States from './components/States';
 import MarkedSelect from './components/MarkedSelect';
 
+const FLAVOURS = [
+	{ label: 'Chocolate', value: 'chocolate' },
+	{ label: 'Vanilla', value: 'vanilla' },
+	{ label: 'Strawberry', value: 'strawberry' },
+	{ label: 'Caramel', value: 'caramel' },
+	{ label: 'Cookies and Cream', value: 'cookiescream' },
+	{ label: 'Peppermint', value: 'peppermint' },
+	{ label: 'Coconut', value: 'coconut' },
+];
+
+function logChange(val) {
+	console.log('Selected: ' + JSON.stringify(val));
+}
+
 ReactDOM.render(
 	<div>
-		<MarkedSelect label="Marked select"/>
+		<MarkedSelect label="Marked select" options={FLAVOURS} onChange={logChange}/>
 		<States label="States" searchable />
 		<Multiselect label="Multiselect" />
 		<Virtualized label="Virtualized" />

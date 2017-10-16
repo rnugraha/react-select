@@ -10,18 +10,11 @@ import PropTypes from 'prop-types';
 import Select from 'react-select';
 import stripDiacritics from './stripDiacritics';
 
-const FLAVOURS = [
-	{ label: 'Chocolate', value: 'chocolate' },
-	{ label: 'Vanilla', value: 'vanilla' },
-	{ label: 'Strawberry', value: 'strawberry' },
-	{ label: 'Caramel', value: 'caramel' },
-	{ label: 'Cookies and Cream', value: 'cookiescream' },
-	{ label: 'Peppermint', value: 'peppermint' },
-];
-
-const WHY_WOULD_YOU = [
-	{ label: 'Chocolate (are you crazy?)', value: 'chocolate', disabled: true },
-].concat(FLAVOURS.slice(1));
+const MarkedValue = createClass({
+	render() {
+		return null;
+	}
+});
 
 const MarkedOption = createClass({
 	propTypes: {
@@ -51,7 +44,7 @@ const MarkedOption = createClass({
 		if (this.props.isFocused) return;
 		this.props.onFocus(this.props.option, event);
 	},
-	renderMarker () {
+	renderMarker () { // TODO: USE NICE ICON
 		let marker = '';
 		if (this.props.option.isSelected) {
 			marker = 'x';
@@ -76,13 +69,8 @@ const MarkedOption = createClass({
 
 const MarkedSelectField = createClass({
 	displayName: 'MultiSelectField',
-	propTypes: {
-		label: PropTypes.string,
-	},
 
 	markSelectedOptions (options, filterValue, currentValue) {
-
-		// console.log('markSelectedOptions', [options, filterValue, currentValue]);
 
 		if (this.props.ignoreAccents) {
 			filterValue = stripDiacritics(filterValue);
@@ -129,52 +117,70 @@ const MarkedSelectField = createClass({
 		};
 	},
 
-	handleSelectChange (newValues) {
-		if (newValues.find()) {
-			console.log(value + ' already existitng');
-		} else {
-			this.setState({ value });
+	toggleSelection (value) {
+		// get last item selected
+		let lastItem = value[value.length - 1];
+
+		// check if current state value already contain new item
+		let foundDuplicate = this.state.value.find(elem => {
+			return elem.value === lastItem.value;
+		});
+
+		// remove item if it exists
+		if (foundDuplicate) {
+			value = this.state.value.filter( val => {
+				return foundDuplicate.value !== val.value;
+			});
+
+			// remove isSelected marker on the option
+			this.props.options.map( option => {
+				if (foundDuplicate.value === option.value) {
+					option.isSelected = false;
+				}
+				return option;
+			});
 		}
 
+		if (this.props.onChange) {
+			this.props.onChange(value);
+		}
+		this.setState({ value });
 	},
+
 	toggleCheckbox (e) {
 		this.setState({
 			[e.target.name]: e.target.checked,
 		});
 	},
+
 	render () {
-		const { crazy, disabled, stayOpen, value } = this.state;
-		const options = crazy ? WHY_WOULD_YOU : FLAVOURS;
+		const { value } = this.state;
 		return (
 			<div className="section">
 				<h3 className="section-heading">{this.props.label}</h3>
 				<Select
 					closeOnSelect={false}
-					disabled={disabled}
+					disabled={this.props.disabled}
 					multi
-					onChange={this.handleSelectChange}
+					onChange={this.toggleSelection}
 					optionComponent={MarkedOption}
-					options={options}
-					markedSelected
+					options={this.props.options}
+					valueComponent={MarkedValue}
 					filterOptions={this.markSelectedOptions}
 					placeholder="Select your favourite(s)"
 					value={value}
 				/>
-
-				<div className="checkbox-list">
-					<label className="checkbox">
-						<input type="checkbox" className="checkbox-control" name="disabled" checked={disabled} onChange={this.toggleCheckbox} />
-						<span className="checkbox-label">Disable the control</span>
-					</label>
-					<label className="checkbox">
-						<input type="checkbox" className="checkbox-control" name="crazy" checked={crazy} onChange={this.toggleCheckbox} />
-						<span className="checkbox-label">I don't like Chocolate (disabled the option)</span>
-					</label>
-				</div>
 			</div>
 		);
 	}
 });
+
+MarkedSelectField.propTypes = {
+	disabled: PropTypes.bool,
+	label: PropTypes.string,
+	onChange: PropTypes.func,
+	options: PropTypes.array,
+};
 
 MarkedSelectField.defaultProps = {
 	ignoreAccents: true,
@@ -182,6 +188,8 @@ MarkedSelectField.defaultProps = {
 	matchPos: 'any',
 	matchProp: 'any',
 	valueKey: 'value',
+	options: [],
+	disabled: false,
 };
 
 
