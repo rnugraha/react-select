@@ -44,13 +44,10 @@ const MarkedOption = createClass({
 		if (this.props.isFocused) return;
 		this.props.onFocus(this.props.option, event);
 	},
-	renderMarker () { // TODO: USE NICE ICON
-		let marker = '';
-		if (this.props.option.isSelected) {
-			marker = 'x';
-		}
+	renderMarker () {
+		let marker = this.props.option.isSelected ? 'fa fa-check-square-o' : 'fa fa-square-o';
 		return(
-			<span>{marker}&nbsp;</span>
+			<span><i className={marker} aria-hidden="true">&nbsp;</i>&nbsp;</span>
 		);
 	},
 	render () {
@@ -153,12 +150,17 @@ const MarkedSelectField = createClass({
 		});
 	},
 
+	renderClearButton () {
+		return null;
+	},
+
 	render () {
 		const { value } = this.state;
 		return (
 			<div className="section">
 				<h3 className="section-heading">{this.props.label}</h3>
 				<Select
+					clearRenderer={this.renderClearButton}
 					closeOnSelect={false}
 					disabled={this.props.disabled}
 					multi
