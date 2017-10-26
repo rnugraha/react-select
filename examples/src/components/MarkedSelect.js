@@ -12,6 +12,12 @@ import classNames from 'classnames';
 import stripDiacritics from './stripDiacritics';
 
 const MarkedValue = createClass({
+	propTypes: {
+		children: PropTypes.node,
+		disabled: PropTypes.bool,               // disabled prop passed to ReactSelect
+		id: PropTypes.string,                   // Unique id for the value - used for aria
+		value: PropTypes.object.isRequired,     // the option object for this value
+	},
 	render() {
 		return null;
 	}
@@ -33,6 +39,18 @@ const MarkedOption = createClass({
 		option: PropTypes.object.isRequired,
 		valueKey: PropTypes.string,
 	},
+	blockEvent (event) {
+		event.preventDefault();
+		event.stopPropagation();
+		if ((event.target.tagName !== 'A') || !('href' in event.target)) {
+			return;
+		}
+		if (event.target.target) {
+			window.open(event.target.href, event.target.target);
+		} else {
+			window.location.href = event.target.href;
+		}
+	},
 	handleMouseDown (event) {
 		event.preventDefault();
 		event.stopPropagation();
@@ -52,11 +70,24 @@ const MarkedOption = createClass({
 		);
 	},
 	render () {
-		return (
-			<div className={this.props.className}
+		let { option, instancePrefix, optionIndex } = this.props;
+		let className = classNames(this.props.className, option.className);
+
+		return option.disabled ? (
+			<div className={className}
+				onMouseDown={this.blockEvent}
+				onClick={this.blockEvent}>
+				{this.renderMarker()}
+				{this.props.option.label}
+			</div>
+		) : (
+			<div className={className}
+				 style={option.style}
+				 role="option"
 				 onMouseDown={this.handleMouseDown}
 				 onMouseEnter={this.handleMouseEnter}
 				 onMouseMove={this.handleMouseMove}
+				 id={instancePrefix + '-option-' + optionIndex}
 				 title={this.props.option.title}>
 				{this.renderMarker()}
 				{this.props.option.label}

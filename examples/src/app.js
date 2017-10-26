@@ -2,7 +2,6 @@
 
 import React from 'react';
 import ReactDOM from 'react-dom';
-import Select from 'react-select';
 import './example.less';
 
 import Creatable from './components/Creatable';
@@ -24,7 +23,7 @@ const FLAVOURS = [
 	{ label: 'Caramel', value: 'caramel' },
 	{ label: 'Cookies and Cream', value: 'cookiescream' },
 	{ label: 'Peppermint', value: 'peppermint' },
-	{ label: 'Coconut', value: 'coconut' },
+	{ label: 'Coconut', value: 'coconut', disabled: true },
 ];
 
 function logChange(val) {
